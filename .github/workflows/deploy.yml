@@ -121,9 +121,9 @@ jobs:
             # Execute production optimization and migration commands in container
             if docker ps --format '{{.Names}}' | grep -q "^manuskrip-web$"; then
               echo "Running migrations and optimization tasks..."
-              docker exec manuskrip-web php artisan key:generate --force || true
               docker exec manuskrip-web php artisan storage:link || true
               docker exec manuskrip-web php artisan migrate --force
+              docker exec manuskrip-web php artisan db:seed --class=JurusanSeeder --force || true
               docker exec manuskrip-web php artisan db:seed --class=ProdiSeeder --force || true
               docker exec manuskrip-web php artisan db:seed --class=KategoriSeeder --force || true
               

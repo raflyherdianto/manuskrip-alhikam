@@ -18,7 +18,7 @@ class JurusanSeeder extends Seeder
         ];
 
         foreach ($jurusans as $jurusan) {
-            Jurusan::create([
+            Jurusan::firstOrCreate([
                 'nama' => $jurusan,
             ]);
         }

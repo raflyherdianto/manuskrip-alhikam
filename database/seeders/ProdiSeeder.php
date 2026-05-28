@@ -40,7 +40,10 @@ class ProdiSeeder extends Seeder
         ];
 
         foreach ($prodis as $prodi) {
-            Prodi::create($prodi);
+            Prodi::firstOrCreate(
+                ['nama' => $prodi['nama']],
+                ['jurusan_id' => $prodi['jurusan_id']]
+            );
         }
 
         $this->command->info('Data Prodi berhasil di-seed!');
