@@ -38,10 +38,13 @@ jobs:
             # Navigate to home directory
             cd ~
 
-            # Initialize folder if it does not exist
-            if [ ! -d "manuskrip-alhikam" ]; then
+            # Initialize folder and clone if .git doesn't exist (even if folder exists with .env)
+            if [ ! -d "manuskrip-alhikam/.git" ]; then
               echo "Cloning repository for the first time..."
-              git clone https://github.com/raflyherdianto/manuskrip-alhikam.git manuskrip-alhikam
+              git clone https://github.com/raflyherdianto/manuskrip-alhikam.git temp-clone
+              mkdir -p manuskrip-alhikam
+              cp -a temp-clone/. manuskrip-alhikam/
+              rm -rf temp-clone
             fi
 
             # Enter the project directory
@@ -52,7 +55,10 @@ jobs:
 
             # Fetch all branches and reset working directory to origin HEAD
             git fetch --all
-            ACTIVE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            ACTIVE_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+            if [ -z "$ACTIVE_BRANCH" ] || [ "$ACTIVE_BRANCH" = "HEAD" ]; then
+              ACTIVE_BRANCH="main"
+            fi
             echo "Current active branch: $ACTIVE_BRANCH"
             git reset --hard origin/$ACTIVE_BRANCH
 
