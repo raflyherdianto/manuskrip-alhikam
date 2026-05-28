@@ -69,7 +69,7 @@
     <section class="school-banner-section py-5">
         <div class="container">
             <div class="school-banner-wrapper" data-aos="fade-up">
-                <img src="{{ asset('assets/img/banner.jpg') }}" alt="Pesantren Mahasiswa Al-Hikam Malang" class="school-banner-img">
+                <img src="{{ asset('assets/img/banner.jpg') }}?v=1.2" alt="Pesantren Mahasiswa Al-Hikam Malang" class="school-banner-img">
             </div>
         </div>
     </section>
