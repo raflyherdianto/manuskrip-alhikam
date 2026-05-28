@@ -44,10 +44,8 @@ ehthumbs.db
 Thumbs.db
 
 # Docker related files
-Dockerfile
 docker-compose.yml
 docker-compose.dev.yml
-.dockerignore
 
 # Exclude all markdown files except README.md
 *.md

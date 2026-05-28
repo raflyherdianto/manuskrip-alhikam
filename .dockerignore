@@ -1,0 +1,34 @@
+# Laravel
+vendor/
+node_modules/
+.env
+.env.backup
+.phpunit.result.cache
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+
+# Docker
+.dockerignore
+docker-compose.yml
+Dockerfile
+
+# Documentation
+*.md
+!README.md
+
+# Public storage (will be volume mounted)
+public/storage
+
+# Uploads will be persisted via volume
+# Don't include in image to keep it clean
