@@ -1,0 +1,283 @@
+# Nginx Proxy Manager Configuration for Upload - Docker Setup
+
+Container Info:
+- NPM Container: 436bbea9b937 (jc21/nginx-proxy-manager:latest)
+- Network: shared-network
+- App Container: smkn3malang-web (connected to shared-network)
+
+## CARA 1: Via Nginx Proxy Manager Web UI (RECOMMENDED)
+
+1. Login ke Nginx Proxy Manager di http://[your-vps-ip]:81
+   - Default: admin@example.com / changeme
+
+2. Buka menu **Proxy Hosts**
+
+3. Cari dan Edit proxy host untuk aplikasi ini
+
+4. Pada tab **Advanced**, tambahkan konfigurasi ini:
+
+```nginx
+# Allow upload up to 15MB
+client_max_body_size 15M;
+proxy_request_buffering off;
+
+# Increase timeouts
+proxy_connect_timeout 300s;
+proxy_send_timeout 300s;
+proxy_read_timeout 300s;
+
+# Buffer settings
+client_body_buffer_size 128k;
+```
+
+5. Klik **Save**
+
+## CARA 2: Edit Langsung Config File di Container
+
+Jika perlu edit langsung, masuk ke container NPM:
+
+```bash
+# Masuk ke container NPM
+docker exec -it 436bbea9b937 /bin/sh
+
+# atau
+docker exec -it npm-stack-app-1 /bin/sh
+
+# Cari file config proxy host
+cd /data/nginx/proxy_host
+ls -la
+
+# Edit file proxy host yang sesuai (misal: 1.conf, 2.conf, dst)
+vi 1.conf
+```
+
+Tambahkan di dalam block `server {}`:
+```nginx
+client_max_body_size 15M;
+proxy_request_buffering off;
+client_body_buffer_size 128k;
+proxy_connect_timeout 300s;
+proxy_send_timeout 300s;
+proxy_read_timeout 300s;
+```
+
+Reload nginx di container:
+```bash
+# Dari dalam container
+nginx -s reload
+exit
+
+# Atau restart container
+docker restart 436bbea9b937
+```
+
+## CARA 3: Edit Global Config NPM
+
+Edit config global untuk semua proxy hosts:
+
+```bash
+docker exec -it 436bbea9b937 /bin/sh
+vi /data/nginx/custom/server_proxy.conf
+```
+
+Tambahkan:
+```nginx
+client_max_body_size 15M;
+proxy_request_buffering off;
+client_body_buffer_size 128k;
+```
+
+Reload:
+```bash
+nginx -s reload
+exit
+```
+
+## Verifikasi Setelah Perubahan
+
+Test upload file 5MB untuk memastikan tidak ada error 413.
+
+---
+
+## TROUBLESHOOTING SSL CERTIFICATE "Internal Error"
+
+### Setup Proxy Host untuk SSL:
+1. Domain Names: eskill-lib.web.id
+2. Forward Hostname/IP: smkn3malang-web
+3. Port: 80
+4. Cache Assets: ON
+5. Block Common Exploits: ON
+6. Websockets Support: OFF (atau ON jika diperlukan)
+
+### Penyebab "Internal Error" saat Request SSL Certificate:
+
+#### 1. Cek DNS Record Domain
+Pastikan domain sudah pointing ke IP VPS:
+```bash
+# Cek dari VPS
+nslookup eskill-lib.web.id
+# atau
+dig eskill-lib.web.id
+
+# Hasil harus menunjukkan IP VPS Anda
+```
+
+Jika belum, tambahkan A Record di DNS provider:
+- Type: A
+- Name: @ atau eskill-lib.web.id
+- Value: [IP VPS Anda]
+- TTL: Auto atau 3600
+
+Tunggu propagasi DNS (5-60 menit).
+
+#### 2. Cek Port 80 dan 443 Terbuka
+```bash
+# Cek firewall
+sudo ufw status
+
+# Jika port belum terbuka:
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw reload
+
+# Cek apakah NPM mendengarkan port 80 dan 443
+docker exec -it 436bbea9b937 netstat -tlnp | grep -E '80|443'
+```
+
+#### 3. Cek Logs NPM untuk Error Detail
+```bash
+# Lihat logs real-time
+docker logs -f 436bbea9b937
+
+# Atau lihat 100 baris terakhir
+docker logs --tail 100 436bbea9b937
+```
+
+Cari error seperti:
+- "DNS lookup failed"
+- "Connection refused"
+- "Challenge failed"
+- "rate limit"
+
+#### 4. Pastikan Let's Encrypt Dapat Akses Domain
+Test akses dari luar:
+```bash
+# Dari komputer lokal atau online tool
+curl http://eskill-lib.web.id
+```
+
+Harus bisa diakses dan tidak menampilkan error 502/504.
+
+#### 5. Matikan Cloudflare Proxy (Jika Menggunakan Cloudflare)
+Jika domain menggunakan Cloudflare:
+- Buka Cloudflare dashboard
+- Cari DNS record eskill-lib.web.id
+- Klik icon cloud (orange) menjadi abu-abu (DNS only)
+- Tunggu beberapa menit
+- Coba request SSL lagi
+
+Setelah SSL berhasil, bisa aktifkan kembali Cloudflare proxy.
+
+#### 6. Gunakan DNS Challenge (Alternatif)
+Jika HTTP challenge gagal, gunakan DNS Challenge:
+
+Di NPM, saat request SSL:
+- Pilih "Use a DNS Challenge"
+- Pilih DNS provider (misal: Cloudflare)
+- Masukkan API credentials
+
+#### 7. Cek Email Let's Encrypt
+Pastikan menggunakan email valid saat request SSL certificate.
+
+#### 8. Rate Limit Let's Encrypt
+Let's Encrypt memiliki rate limit:
+- 5 kali gagal per jam per domain
+- Tunggu 1 jam jika sudah mencoba berkali-kali
+
+#### 9. Restart Complete NPM
+```bash
+# Stop container
+docker stop 436bbea9b937
+
+# Start container
+docker start 436bbea9b937
+
+# Atau restart
+docker restart 436bbea9b937
+
+# Tunggu 30 detik, cek status
+docker ps | grep nginx-proxy-manager
+```
+
+#### 10. Cek Database NPM (Advanced)
+```bash
+# Masuk ke container
+docker exec -it 436bbea9b937 /bin/sh
+
+# Cek SQLite database
+cd /data
+ls -la database.sqlite
+
+# Backup database
+cp database.sqlite database.sqlite.backup
+
+# Exit
+exit
+```
+
+### Langkah Lengkap Request SSL (Step by Step):
+
+```bash
+# 1. Pastikan DNS sudah benar
+nslookup eskill-lib.web.id
+
+# 2. Test akses HTTP
+curl -I http://eskill-lib.web.id
+
+# 3. Cek logs NPM
+docker logs -f 436bbea9b937
+
+# Di terminal lain, buka NPM UI dan request SSL
+# Perhatikan logs untuk error detail
+```
+
+### Jika Masih Gagal - Manual Certbot:
+
+```bash
+# Install certbot di VPS
+sudo apt update
+sudo apt install certbot
+
+# Stop NPM sementara
+docker stop 436bbea9b937
+
+# Request certificate manual
+sudo certbot certonly --standalone -d eskill-lib.web.id
+
+# Certificate akan tersimpan di:
+# /etc/letsencrypt/live/eskill-lib.web.id/fullchain.pem
+# /etc/letsencrypt/live/eskill-lib.web.id/privkey.pem
+
+# Start NPM kembali
+docker start 436bbea9b937
+
+# Upload certificate manual via NPM UI:
+# SSL Certificates > Add SSL Certificate > Custom
+```
+
+### Common Error Messages:
+
+**"Challenge failed for domain eskill-lib.web.id"**
+→ Domain tidak dapat diakses dari internet, cek DNS dan firewall
+
+**"DNS problem: NXDOMAIN"**
+→ Domain tidak ditemukan, cek DNS record
+
+**"Connection refused"**
+→ Port 80/443 tidak terbuka atau NPM tidak berjalan
+
+**"Too many certificates already issued"**
+→ Rate limit, tunggu 1 jam
+
+**"Invalid response from http://eskill-lib.web.id/.well-known/acme-challenge/"**
+→ NPM tidak bisa serve challenge file, cek proxy host settings

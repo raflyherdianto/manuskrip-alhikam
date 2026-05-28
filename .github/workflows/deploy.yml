@@ -1,0 +1,145 @@
+name: Deploy Manuskrip Al-Hikam
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  deploy:
+    name: Deploy to EC2 production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Execute remote SSH commands to Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            # Check if Docker is installed
+            if ! command -v docker &> /dev/null; then
+              echo "Error: Docker is not installed on the server."
+              exit 1
+            fi
+
+            # Check if docker-compose / docker compose is available
+            if ! docker compose version &> /dev/null; then
+              echo "Error: docker compose command is not available."
+              exit 1
+            fi
+
+            # Navigate to home directory
+            cd ~
+
+            # Initialize folder if it does not exist
+            if [ ! -d "manuskrip-alhikam" ]; then
+              echo "Cloning repository for the first time..."
+              git clone https://github.com/raflyherdianto/manuskrip-alhikam.git manuskrip-alhikam
+            fi
+
+            # Enter the project directory
+            cd manuskrip-alhikam
+
+            # Set git repository permission safe folder to avoid issues
+            git config --global --add safe.directory /home/${{ secrets.SSH_USERNAME }}/manuskrip-alhikam
+
+            # Fetch all branches and reset working directory to origin HEAD
+            git fetch --all
+            ACTIVE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+            echo "Current active branch: $ACTIVE_BRANCH"
+            git reset --hard origin/$ACTIVE_BRANCH
+
+            # Ensure .env exists (warn if missing, do not overwrite)
+            if [ ! -f ".env" ]; then
+              echo "Warning: .env file is missing. Copying .env.example as a temporary placeholder."
+              cp .env.example .env
+              echo "Please configure the production credentials in ~/manuskrip-alhikam/.env manually!"
+            else
+              echo ".env file already exists. Preserving manual configuration."
+            fi
+
+            # Recreate docker-compose.yml dynamically
+            cat << 'EOF' > docker-compose.yml
+            services:
+              app:
+                build:
+                  context: .
+                  dockerfile: Dockerfile
+                container_name: manuskrip-web
+                restart: unless-stopped
+                volumes:
+                  - ./.env:/var/www/html/.env:ro
+                  - ./storage/app/public:/var/www/html/storage/app/public
+                  - ./uploads:/var/www/html/public/uploads
+                networks:
+                  - shared-network
+
+            networks:
+              shared-network:
+                external: true
+            EOF
+
+            echo "docker-compose.yml recreated successfully."
+
+            # Ensure volume directories exist locally in the project path
+            mkdir -p storage/app/public
+            mkdir -p uploads
+
+            # Stop and remove old manuskrip-web-old if exists
+            if docker ps -a --format '{{.Names}}' | grep -q "^manuskrip-web-old$"; then
+              echo "Removing old backup container..."
+              docker rm -f manuskrip-web-old
+            fi
+
+            # Backup current running container to manuskrip-web-old if running
+            if docker ps --format '{{.Names}}' | grep -q "^manuskrip-web$"; then
+              echo "Renaming running container to backup..."
+              docker rename manuskrip-web manuskrip-web-old
+            fi
+
+            # Build and launch new container
+            echo "Building and starting new Docker container..."
+            docker compose up -d --build
+
+            # Wait for container to be healthy / online
+            echo "Waiting for container to start up..."
+            sleep 10
+
+            # Execute production optimization and migration commands in container
+            if docker ps --format '{{.Names}}' | grep -q "^manuskrip-web$"; then
+              echo "Running migrations and optimization tasks..."
+              docker exec manuskrip-web php artisan key:generate --force || true
+              docker exec manuskrip-web php artisan storage:link || true
+              docker exec manuskrip-web php artisan migrate --force
+              docker exec manuskrip-web php artisan db:seed --class=ProdiSeeder --force || true
+              docker exec manuskrip-web php artisan db:seed --class=KategoriSeeder --force || true
+              
+              # Clear Laravel config & view cache
+              docker exec manuskrip-web php artisan config:clear
+              docker exec manuskrip-web php artisan view:clear
+              docker exec manuskrip-web php artisan route:clear
+              docker exec manuskrip-web php artisan cache:clear
+
+              # Remove old backup container if the new one is running successfully
+              if docker ps --format '{{.Names}}' | grep -q "^manuskrip-web$"; then
+                echo "Deployment successful. Cleaning up backup container..."
+                docker rm -f manuskrip-web-old 2>/dev/null || true
+              fi
+            else
+              echo "Error: New container manuskrip-web failed to start."
+              if docker ps -a --format '{{.Names}}' | grep -q "^manuskrip-web-old$"; then
+                echo "Rolling back to previous working container..."
+                docker rename manuskrip-web-old manuskrip-web
+                docker start manuskrip-web
+              fi
+              exit 1
+            fi
+
+            echo "Deployment finished successfully!"

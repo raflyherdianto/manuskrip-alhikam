@@ -1,0 +1,1664 @@
+/* ============================================
+   ACTIVITY DASHBOARD - MOBILE FIRST APPROACH
+   ============================================ */
+
+/* Reset & Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.activity-dashboard {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #efefef;
+    position: relative;
+}
+
+/* ============================================
+   SIDEBAR STYLES
+   ============================================ */
+
+.activity-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    width: 280px;
+    height: 100vh;
+    background-color: #1F304B;
+    color: white;
+    transition: left 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+.activity-sidebar.active {
+    left: 0;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    font-family: 'Inknut Antiqua', serif;
+}
+
+.sidebar-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.sidebar-close:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* User Info Section */
+.sidebar-user {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #4A5F7F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: white;
+}
+
+.user-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.user-role {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Navigation Menu */
+.sidebar-nav {
+    padding: 1rem 0;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-item {
+    margin: 0;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.875rem 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: all 0.3s;
+    font-size: 1rem;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.nav-link.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    border-left: 4px solid white;
+}
+
+.nav-link i {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    width: 24px;
+    text-align: center;
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* ============================================
+   MAIN CONTENT AREA
+   ============================================ */
+
+.activity-main {
+    flex: 1;
+    width: 100%;
+    padding: 1rem;
+    transition: margin-left 0.3s ease;
+}
+
+/* Header with Toggle Button */
+.activity-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.menu-toggle {
+    background-color: #1F304B;
+    border: none;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+.menu-toggle:hover {
+    background-color: #2d4363;
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1F304B;
+    font-family: 'Inknut Antiqua', serif;
+    margin: 0;
+}
+
+/* Dashboard Content Container */
+.dashboard-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    background-color: white;
+    padding: 0.875rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card.clickable {
+    cursor: pointer;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 0.375rem;
+    margin-top: 0.375rem;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1F304B;
+    line-height: 1.2;
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    color: #1F304B;
+    margin-bottom: 0;
+}
+
+/* Activity Button */
+.activity-button-wrapper {
+    margin-bottom: 1.5rem;
+}
+
+.activity-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1F304B;
+    color: white;
+    padding: 0.875rem 1.5rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-size: 1.125rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+    width: 100%;
+    font-family: 'Instrument Sans', sans-serif;
+}
+
+.activity-button:hover {
+    background-color: #2d4363;
+    color: white;
+}
+
+/* Chart Container */
+.chart-container {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.chart-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1F304B;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.chart-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.year-filter-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #666;
+    margin: 0;
+}
+
+.year-filter-select {
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    background-color: white;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #1F304B;
+    cursor: pointer;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231F304B' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+}
+
+.year-filter-select:hover {
+    border-color: #1F304B;
+}
+
+.year-filter-select:focus {
+    outline: none;
+    border-color: #1F304B;
+    box-shadow: 0 0 0 0.2rem rgba(31, 48, 75, 0.15);
+}
+
+.chart-wrapper {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+/* Profile Section */
+.profile-section {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.profile-avatar-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #1F304B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 600;
+    color: white;
+    margin-right: 1rem;
+}
+
+.profile-info h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1F304B;
+    margin-bottom: 0.25rem;
+}
+
+.profile-info p {
+    color: #666;
+    margin: 0;
+}
+
+.profile-actions {
+    margin-bottom: 1.5rem;
+}
+
+.btn-edit-profile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1F304B;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Instrument Sans', sans-serif;
+}
+
+.btn-edit-profile:hover {
+    background-color: #2d4363;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.profile-details {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.profile-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-label {
+    font-size: 0.875rem;
+    color: #666;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+}
+
+.profile-value {
+    font-size: 1rem;
+    color: #333;
+    padding: 0.5rem;
+    background-color: #f5f5f5;
+    border-radius: 0.25rem;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.modal-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-container {
+    background-color: white;
+    border-radius: 0.5rem;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1F304B;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #666;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.modal-close:hover {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 0.375rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-family: 'Instrument Sans', sans-serif;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #1F304B;
+    box-shadow: 0 0 0 3px rgba(31, 48, 75, 0.1);
+}
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+}
+
+.btn-cancel {
+    padding: 0.75rem 1.5rem;
+    background-color: #f5f5f5;
+    color: #333;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Instrument Sans', sans-serif;
+}
+
+.btn-cancel:hover {
+    background-color: #e0e0e0;
+}
+
+.btn-submit {
+    padding: 0.75rem 1.5rem;
+    background-color: #1F304B;
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-family: 'Instrument Sans', sans-serif;
+}
+
+.btn-submit:hover {
+    background-color: #2d4363;
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - TABLET
+   ============================================ */
+
+@media (min-width: 576px) {
+    .activity-main {
+        padding: 1.5rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .activity-button {
+        width: auto;
+        min-width: 200px;
+    }
+
+    .chart-wrapper {
+        height: 350px;
+    }
+
+    .profile-details {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN - DESKTOP
+   ============================================ */
+
+@media (min-width: 768px) {
+    .activity-dashboard {
+        flex-direction: row;
+    }
+
+    .activity-sidebar {
+        position: static !important;
+        left: auto !important;
+        transform: none !important;
+        width: 280px;
+        height: auto;
+        min-height: 100vh;
+        z-index: 1;
+        display: block !important;
+        transition: none;
+    }
+
+    .sidebar-close {
+        display: none;
+    }
+
+    .sidebar-overlay {
+        display: none !important;
+    }
+
+    .activity-main {
+        padding: 2rem;
+        margin-left: 0;
+        flex: 1;
+        width: calc(100% - 280px);
+    }
+
+    .menu-toggle {
+        display: none;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+    }
+
+    .stat-card {
+        padding: 1.25rem;
+    }
+
+    .stat-icon {
+        font-size: 1.75rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+    }
+
+    .chart-wrapper {
+        height: 400px;
+    }
+
+    .activity-header {
+        padding: 1.5rem;
+    }
+
+    .page-title {
+        font-size: 1.75rem;
+        font-weight: 800;
+    }
+}
+
+@media (min-width: 1024px) {
+    .chart-wrapper {
+        height: 450px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+    }
+
+    .stat-card {
+        padding: 1.5rem;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+    }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.text-center {
+    text-align: center;
+}
+
+.mt-1 {
+    margin-top: 0.5rem;
+}
+
+.mt-2 {
+    margin-top: 1rem;
+}
+
+.mb-1 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 1rem;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ============================================
+   DATATABLES STYLING
+   ============================================ */
+
+.activity-table-wrapper {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.table-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1F304B;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* DataTables Custom Styling */
+#activityTable {
+    font-size: 0.875rem;
+}
+
+#activityTable thead th {
+    background-color: #1F304B;
+    color: white;
+    font-weight: 600;
+    padding: 12px 8px;
+    border: none;
+    white-space: nowrap;
+}
+
+#activityTable tbody td {
+    padding: 12px 8px;
+    vertical-align: middle;
+}
+
+#activityTable tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Action Buttons */
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+    margin: 0 2px;
+}
+
+.btn-group-sm .btn i {
+    font-size: 0.875rem;
+}
+
+/* Status Badges */
+.badge {
+    padding: 0.35rem 0.65rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Read More Functionality */
+.description-short,
+.description-full {
+    display: inline;
+}
+
+.read-more-btn {
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.read-more-btn:hover {
+    text-decoration: underline;
+}
+
+/* DataTables Controls */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 1rem;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    padding: 0.375rem 2rem 0.375rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    background-color: white;
+    margin: 0 0.5rem;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    margin-left: 0.5rem;
+}
+
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_paginate {
+    margin-top: 1rem;
+}
+
+/* Pagination Styling */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.375rem 0.75rem;
+    margin: 0 2px;
+    border-radius: 0.25rem;
+    border: 1px solid #dee2e6;
+    background-color: white;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background-color: #1F304B;
+    color: white !important;
+    border-color: #1F304B;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .activity-table-wrapper {
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .table-title {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    #activityTable {
+        font-size: 0.8rem;
+    }
+
+    #activityTable thead th,
+    #activityTable tbody td {
+        padding: 8px 4px;
+    }
+
+    .btn-group-sm .btn {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.75rem;
+        margin: 1px;
+    }
+
+    /* Stack buttons vertically on very small screens */
+    .btn-group {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .btn-group .btn {
+        width: 100%;
+    }
+
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        margin-bottom: 0.75rem;
+    }
+
+    .dataTables_wrapper .dataTables_length select,
+    .dataTables_wrapper .dataTables_filter input {
+        font-size: 0.875rem;
+    }
+}
+
+/* Tablet Responsive */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .btn-group {
+        flex-wrap: wrap;
+    }
+}
+
+/* Desktop Responsive */
+@media (min-width: 1025px) {
+    .activity-table-wrapper {
+        padding: 2rem;
+    }
+
+    .table-title {
+        font-size: 1.5rem;
+    }
+
+    #activityTable {
+        font-size: 0.95rem;
+    }
+}
+
+/* Horizontal Scroll Indicator */
+.table-responsive::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 30px;
+    background: linear-gradient(to right, transparent, rgba(0,0,0,0.05));
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.table-responsive.has-scroll::after {
+    opacity: 1;
+}
+
+/* ============================================
+   MODAL STYLES
+   ============================================ */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 2000;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.modal-overlay.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1F304B;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.modal-close:hover {
+    background-color: #f8f9fa;
+    color: #1F304B;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex: 1;
+}
+
+/* Loading State */
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    color: #666;
+}
+
+.loading-spinner i {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: #1F304B;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-spinner span {
+    font-size: 0.875rem;
+}
+
+/* Empty State */
+.empty-state,
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    color: #999;
+}
+
+.empty-state i,
+.error-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #ccc;
+}
+
+.error-state i {
+    color: #dc3545;
+}
+
+.empty-state p,
+.error-state p {
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* Yearly History List */
+.yearly-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.5rem;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.history-item:hover {
+    background-color: #e9ecef;
+    transform: translateX(4px);
+}
+
+.history-year {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1F304B;
+}
+
+.history-year i {
+    font-size: 1.25rem;
+}
+
+.history-count {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.count-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1F304B;
+}
+
+.count-label {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+/* ============================================
+   BOOTSTRAP MODAL CUSTOMIZATION FOR UPLOAD KARYA
+   ============================================ */
+
+/* Fix Bootstrap Modal for proper centering and scrolling */
+#uploadKaryaModal .modal-dialog {
+    max-width: 900px;
+    margin: 1.75rem auto;
+}
+
+#uploadKaryaModal .modal-dialog-scrollable {
+    height: calc(100vh - 3.5rem);
+}
+
+#uploadKaryaModal .modal-dialog-scrollable .modal-content {
+    max-height: 100%;
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+#uploadKaryaModal .modal-content {
+    display: flex;
+    flex-direction: column;
+}
+
+#uploadKaryaModal .modal-header {
+    flex-shrink: 0;
+    border-bottom: 2px solid #e9ecef;
+    padding: 1.25rem 1.5rem;
+    background-color: #f8f9fa;
+}
+
+#uploadKaryaModal .modal-title {
+    color: #1F304B;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+#uploadKaryaModal .modal-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 1.5rem;
+    max-height: calc(100vh - 250px);
+}
+
+/* Ensure form elements look good */
+#uploadKaryaModal .form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+#uploadKaryaModal .form-control,
+#uploadKaryaModal .form-select {
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.95rem;
+}
+
+#uploadKaryaModal .form-control:focus,
+#uploadKaryaModal .form-select:focus {
+    border-color: #1F304B;
+    box-shadow: 0 0 0 0.2rem rgba(31, 48, 75, 0.15);
+}
+
+#uploadKaryaModal .form-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+#uploadKaryaModal .modal-footer {
+    flex-shrink: 0;
+    border-top: 2px solid #e9ecef;
+    padding: 1rem 1.5rem;
+    background-color: #f8f9fa;
+}
+
+/* Quill Editor Styling */
+#uploadKaryaModal #editor {
+    background-color: white;
+    min-height: 200px;
+}
+
+#uploadKaryaModal .ql-toolbar {
+    border: 1px solid #ced4da;
+    border-bottom: none;
+    border-radius: 0.375rem 0.375rem 0 0;
+    background-color: #f8f9fa;
+}
+
+#uploadKaryaModal .ql-container {
+    border: 1px solid #ced4da;
+    border-radius: 0 0 0.375rem 0.375rem;
+    font-family: 'Instrument Sans', sans-serif;
+}
+
+/* Mobile Responsive - Tablets */
+@media (max-width: 991px) {
+    #uploadKaryaModal .modal-dialog {
+        max-width: 720px;
+        margin: 1rem auto;
+    }
+
+    #uploadKaryaModal .modal-dialog-scrollable {
+        height: calc(100vh - 2rem);
+    }
+}
+
+/* Mobile Responsive - Phones */
+@media (max-width: 768px) {
+    #uploadKaryaModal .modal-dialog {
+        max-width: 100%;
+        margin: 0.5rem;
+        width: calc(100% - 1rem);
+    }
+
+    #uploadKaryaModal .modal-dialog-scrollable {
+        height: calc(100vh - 1rem);
+    }
+
+    #uploadKaryaModal .modal-header,
+    #uploadKaryaModal .modal-body,
+    #uploadKaryaModal .modal-footer {
+        padding: 1rem;
+    }
+
+    #uploadKaryaModal .modal-title {
+        font-size: 1.1rem;
+    }
+
+    #uploadKaryaModal .modal-body {
+        max-height: calc(100vh - 180px);
+    }
+
+    /* Stack form columns on mobile */
+    #uploadKaryaModal .row .col-md-6 {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    /* Adjust Quill editor height on mobile */
+    #uploadKaryaModal #editor {
+        min-height: 150px;
+    }
+
+    /* Button styling for mobile */
+    #uploadKaryaModal .modal-footer .btn {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 576px) {
+    #uploadKaryaModal .modal-dialog {
+        margin: 0.25rem;
+        width: calc(100% - 0.5rem);
+    }
+
+    #uploadKaryaModal .modal-dialog-scrollable {
+        height: calc(100vh - 0.5rem);
+    }
+
+    #uploadKaryaModal .modal-header,
+    #uploadKaryaModal .modal-body,
+    #uploadKaryaModal .modal-footer {
+        padding: 0.75rem;
+    }
+
+    #uploadKaryaModal .modal-title {
+        font-size: 1rem;
+    }
+
+    #uploadKaryaModal .modal-body {
+        max-height: calc(100vh - 160px);
+    }
+
+    #uploadKaryaModal .btn-close {
+        font-size: 0.85rem;
+        padding: 0.25rem;
+    }
+
+    /* Make form elements more touch-friendly */
+    #uploadKaryaModal .form-control,
+    #uploadKaryaModal .form-select {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 0.625rem;
+    }
+
+    #uploadKaryaModal .form-label {
+        font-size: 0.9rem;
+    }
+
+    /* Compact footer buttons */
+    #uploadKaryaModal .modal-footer {
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 0.5rem;
+    }
+
+    #uploadKaryaModal .modal-footer .btn {
+        flex: 1;
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+}
+
+/* Ensure modal backdrop works correctly */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-backdrop.show {
+    opacity: 0.5;
+}
+
+/* Modal Mobile Responsive - Other Modals */
+@media (max-width: 768px) {
+    .modal-content {
+        max-height: 90vh;
+        margin: 0.5rem;
+    }
+
+    .modal-header,
+    .modal-body {
+        padding: 1rem;
+    }
+
+    .modal-title {
+        font-size: 1.1rem;
+    }
+
+    .history-year {
+        font-size: 0.9rem;
+    }
+
+    .count-value {
+        font-size: 1.5rem;
+    }
+
+    .chart-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .chart-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .year-filter-select {
+        flex: 1;
+    }
+}
+
+/* ============================================
+   ADDITIONAL MODAL ENHANCEMENTS
+   ============================================ */
+
+/* Smooth scrolling for modal body */
+#uploadKaryaModal .modal-body {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* Fix for iOS Safari bottom spacing */
+@supports (-webkit-touch-callout: none) {
+    #uploadKaryaModal .modal-body {
+        padding-bottom: env(safe-area-inset-bottom, 1.5rem);
+    }
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+    overflow: hidden;
+    padding-right: 0 !important;
+}
+
+/* Desktop: Center modal vertically with proper spacing */
+@media (min-width: 769px) {
+    #uploadKaryaModal .modal-dialog-centered {
+        display: flex;
+        align-items: center;
+        min-height: calc(100% - 3.5rem);
+        margin: 1.75rem auto;
+    }
+
+    #uploadKaryaModal .modal-dialog {
+        display: flex;
+        align-items: center;
+        min-height: calc(100vh - 3.5rem);
+    }
+
+    #uploadKaryaModal .modal-dialog-scrollable .modal-body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Ensure modal backdrop is behind modal */
+    .modal-backdrop {
+        z-index: 1040;
+    }
+
+    #uploadKaryaModal {
+        z-index: 1050;
+    }
+}
+
+/* Improve touch targets for mobile */
+@media (max-width: 768px) {
+    #uploadKaryaModal .btn {
+        min-height: 44px;
+        touch-action: manipulation;
+    }
+
+    #uploadKaryaModal .form-control,
+    #uploadKaryaModal .form-select {
+        min-height: 44px;
+    }
+}
+
+/* Accessibility: Focus states */
+#uploadKaryaModal .btn:focus,
+#uploadKaryaModal .form-control:focus,
+#uploadKaryaModal .form-select:focus {
+    outline: 2px solid #1F304B;
+    outline-offset: 2px;
+}
+
+/* Loading state for form submission */
+#uploadKaryaForm.submitting {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* ============================================
+   UPLOAD PROGRESS BAR STYLES
+   ============================================ */
+
+#uploadProgressContainer {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+}
+
+#uploadProgressContainer .progress {
+    background-color: #e9ecef;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+#uploadProgressBar {
+    background: linear-gradient(90deg, #1F304B 0%, #2d4a73 100%);
+    transition: width 0.3s ease;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 20px;
+    color: white;
+    text-align: center;
+}
+
+#uploadProgressBar.bg-success {
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%) !important;
+}
+
+#uploadProgressBar.bg-danger {
+    background: linear-gradient(90deg, #dc3545 0%, #e74c3c 100%) !important;
+}
+
+#uploadProgressPercent {
+    font-weight: 600;
+    color: #1F304B;
+}
+
+#uploadStatus {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Animation for progress bar */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+#uploadProgressContainer.uploading {
+    animation: pulse 2s infinite;
+}
+
+/* Mobile responsive for progress bar */
+@media (max-width: 576px) {
+    #uploadProgressContainer,
+    #editUploadProgressContainer {
+        padding: 0.75rem;
+    }
+
+    #uploadProgressBar,
+    #editUploadProgressBar {
+        font-size: 0.75rem;
+        line-height: 18px;
+    }
+
+    #uploadStatus,
+    #editUploadStatus {
+        font-size: 0.75rem;
+    }
+}
+
+/* ============================================
+   EDIT UPLOAD PROGRESS BAR STYLES
+   ============================================ */
+
+#editUploadProgressContainer {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #dee2e6;
+}
+
+#editUploadProgressContainer .progress {
+    background-color: #e9ecef;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+#editUploadProgressBar {
+    background: linear-gradient(90deg, #1F304B 0%, #2d4a73 100%);
+    transition: width 0.3s ease;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 20px;
+    color: white;
+    text-align: center;
+}
+
+#editUploadProgressBar.bg-success {
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%) !important;
+}
+
+#editUploadProgressBar.bg-danger {
+    background: linear-gradient(90deg, #dc3545 0%, #e74c3c 100%) !important;
+}
+
+#editUploadProgressPercent {
+    font-weight: 600;
+    color: #1F304B;
+}
+
+#editUploadStatus {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Loading state for edit form submission */
+#editKaryaForm.submitting {
+    opacity: 0.6;
+    pointer-events: none;
+}
