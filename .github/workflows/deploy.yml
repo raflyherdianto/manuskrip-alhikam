@@ -81,7 +81,7 @@ jobs:
                 container_name: manuskrip-web
                 restart: unless-stopped
                 ports:
-                  - "127.0.0.1:8080:80"
+                  - "127.0.0.1:8081:80"
                 volumes:
                   - ./.env:/var/www/html/.env:ro
                   - ./storage/app/public:/var/www/html/storage/app/public
