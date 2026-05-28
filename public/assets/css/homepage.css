@@ -1248,19 +1248,9 @@ body {
     margin: 0 auto;
     overflow: hidden;
     border-radius: var(--radius-lg);
-    box-shadow: none;
-    background: transparent;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    background: #f8f9fa;
     padding: 0;
-    max-height: 75vh;
-}
-
-@keyframes zoomOutBanner {
-    from {
-        transform: scale(1.15);
-    }
-    to {
-        transform: scale(1.0);
-    }
 }
 
 .school-banner-img {
@@ -1268,16 +1258,13 @@ body {
     height: auto;
     display: block;
     border-radius: var(--radius-md);
-    object-fit: cover;
-    object-position: top center;
-    transform: scale(1.15); /* Start zoomed-in */
-    animation: zoomOutBanner 8s cubic-bezier(0.16, 1, 0.3, 1) forwards; /* Smooth cinematic zoom-out */
-    transform-origin: center center;
-    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    object-fit: contain;
+    transform: none; /* No initial scaling/zoom-in to prevent cropping */
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .school-banner-img:hover {
-    transform: scale(1.03); /* Subtle hover-zoom feedback */
+    transform: scale(1.01); /* Very subtle hover-zoom feedback */
 }
 
 /* Responsive Banner */
