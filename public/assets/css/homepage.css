@@ -1254,6 +1254,15 @@ body {
     max-height: 75vh;
 }
 
+@keyframes zoomOutBanner {
+    from {
+        transform: scale(1.15);
+    }
+    to {
+        transform: scale(1.0);
+    }
+}
+
 .school-banner-img {
     width: 100%;
     height: auto;
@@ -1261,6 +1270,14 @@ body {
     border-radius: var(--radius-md);
     object-fit: cover;
     object-position: top center;
+    transform: scale(1.15); /* Start zoomed-in */
+    animation: zoomOutBanner 8s cubic-bezier(0.16, 1, 0.3, 1) forwards; /* Smooth cinematic zoom-out */
+    transform-origin: center center;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.school-banner-img:hover {
+    transform: scale(1.03); /* Subtle hover-zoom feedback */
 }
 
 /* Responsive Banner */
