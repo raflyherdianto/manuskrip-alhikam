@@ -13,7 +13,7 @@
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ asset('assets/css/homepage.css') }}?v=1.1">
+    <link rel="stylesheet" href="{{ asset('assets/css/homepage.css') }}?v=1.2">
 
     <style>
         :root {

@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inknut+Antiqua&display=swap" rel="stylesheet">
 
     <!-- Homepage Styles - Apply to all pages -->
-    <link href="{{ asset('assets/css/homepage.css') }}?v=1.1" rel="stylesheet">
+    <link href="{{ asset('assets/css/homepage.css') }}?v=1.2" rel="stylesheet">
 
     <!-- Vite Assets - Will work in both dev and production -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
